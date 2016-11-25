@@ -21,22 +21,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
   
-    /*
-      http.authorizeRequests()
-        .antMatchers("/", "/login").permitAll() 
-        .antMatchers("/admin/**").access("hasRole('ADMIN')")
-        .antMatchers("/db/**").access("hasRole('ADMIN') and hasRole('DBA')")
-        .and().formLogin()
-        .and().exceptionHandling().accessDeniedPage("/Access_Denied");
-      */
-    	
       http
       .authorizeRequests()
       	.antMatchers("/", "/login").permitAll() 
         .anyRequest().authenticated()
         .and()
       .formLogin()
-          .loginPage("/login")
+          .loginPage("/login").defaultSuccessUrl("/")
           .permitAll();
+      
     }
 }

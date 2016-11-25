@@ -3,6 +3,7 @@ package com.webapp.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,11 +14,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/")
+
 public class MainController {
-	@RequestMapping(method = RequestMethod.GET)
-	public String sayHello(ModelMap model) {
-		model.addAttribute("greeting", "Hello World from Spring 4 MVC");
+
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String entry(ModelMap model) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+		System.out.println("Name: " + auth.getName());
+		System.out.println("auth1: " + auth.isAuthenticated());
+		System.out.println("auth2: " + this.isAuthenticated());
+
+		if (this.isAuthenticated()) {
+			model.addAttribute("logged", "true");
+		}
+
 		return "welcome";
 	}
 
@@ -29,7 +41,7 @@ public class MainController {
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String loginPage(ModelMap model) {
-
+		
 		return "login";
 	}
 
@@ -39,7 +51,7 @@ public class MainController {
 		if (auth != null) {
 			new SecurityContextLogoutHandler().logout(request, response, auth);
 		}
-		request.getSession().setAttribute("greeting", "You have been logged out!!!");
+		request.setAttribute("logout", "true");
 		return "welcome";
 	}
 
@@ -53,5 +65,12 @@ public class MainController {
 			userName = principal.toString();
 		}
 		return userName;
+	}
+
+	public boolean isAuthenticated() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication != null && !(authentication instanceof AnonymousAuthenticationToken)
+				&& authentication.isAuthenticated();
+
 	}
 }
